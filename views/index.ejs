@@ -13,7 +13,7 @@
 <body>
   <div class="container">
     <%= messages.error %>
-    <form id="form" class="form" action="/signup" method="POST">
+    <form id="form" class="form" action="/signup" method="POST" autocomplete="off">
       <h2>Register With Us</h2>
       <div class="form-control <%= (messages.error)?"error":""%>">
         <p class="otp"><%= err || auth %></p>
