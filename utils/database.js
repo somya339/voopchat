@@ -1,7 +1,7 @@
 const mongo = require('mongodb');
 let _db;
 exports.connect = (cb) => {
-    mongo.connect("mongodb+srv://somyagupta:SBaNAT6L2MMxdtvr@shop.xcr2h.mongodb.net/product", {
+    mongo.connect(`mongodb+srv://somyagupta:${process.env.DATAKEY}@shop.xcr2h.mongodb.net/product`, {
         useUnifiedTopology: true
     }).then((result) => {
         console.log("Database connected.")

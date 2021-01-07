@@ -8,13 +8,6 @@ let details;
 console.log(otp);
 //https://www.google.com/settings/security/lesssecureapps 
 
-let transporter = mail.createTransport({
-    service: "Gmail",
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-    }
-})
 const signup = require('../model/model');
 exports.getSignup = (req, res) => {
     res.render("index", {
@@ -26,6 +19,17 @@ exports.getSignup = (req, res) => {
 exports.postSignup = (req, res) => {
     signup.fetch(req.body.email, req.body.username, (result) => {
         if (result == null) {
+            // console.log(process.env.EMAIL , req.body.email);
+            let transporter = mail.createTransport({
+                host : "smtp.gmail.com",
+                service: "gmail",
+                port: 465, 
+                secure: false,
+                auth: {
+                    user: process.env.EMAIL,
+                    pass: process.env.PASSWORD
+                }
+            })
             let mailoptions = {
                 from: process.env.EMAIL,
                 to: `${req.body.email}`,
@@ -37,6 +41,7 @@ exports.postSignup = (req, res) => {
             }, 200000);
             transporter.sendMail(mailoptions, (err, data) => {
                 if (err) {
+                    console.log(data);
                     console.log(err);
                 } else {
                     console.log("MAIL sent!");

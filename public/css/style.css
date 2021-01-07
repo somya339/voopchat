@@ -28,6 +28,19 @@ body {
   width: 400px;
 }
 
+@media(max-width:750px) {
+  body {
+    /* background-color: #f9fafb; */
+    background-image: url("../images/4.jpg");
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+}
+
 h1 {
   font-family: "Open Sans", sans-serif;
   font-size: 40px;
@@ -126,6 +139,7 @@ p {
 .icon img {
   height: 15px;
 }
-.wrap{
+
+.wrap {
   display: flex;
 }
