@@ -1,5 +1,4 @@
 const mail = require('nodemailer');
-const env = require('dotenv').config();
 const bcrypt = require('bcrypt');
 let otp = Math.floor(Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + 4).toString();
 if (otp.length < 4) {

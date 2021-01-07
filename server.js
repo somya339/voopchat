@@ -7,7 +7,14 @@ const router = require('./router/router');
 const body = require('body-parser');
 const flash = require('express-flash');
 const session = require('express-session');
-
+const env = require('dotenv');
+env.config();
+console.log(process.env.SECRET);
+app.use(session({
+        secret: process.env.SECRET,
+        resave: false,
+    saveUninitialized: false
+}))
 app.use(body.urlencoded({
     extended: false
 }))
@@ -39,11 +46,6 @@ app.set("views", "views");
 app.set("view engine", "ejs");
 
 app.use(flash());
-app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
 
 router.get("/", (req, res) => {
     res.redirect(`/signup`)
