@@ -1,0 +1,132 @@
+body{
+    overflow: hidden;
+}
+.main {
+    height: 100vh;
+    display: flex;
+}
+
+.main__left {
+    flex: 0.8;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.main__right {
+    flex: 0.2;
+    position: absolute;
+    height: 100%;
+    width: 20%;
+    right: 0;
+}
+
+.main__videos {
+    flex-grow: 1;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.main__controls {
+    background-color: #1C1E20;
+    color: #D2D2D2;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+
+.main__right {
+    background-color: #242324;
+    border-left: 1px solid #3D3D42;
+    transform: translateX(100%);
+    transition: all 500ms ease-in-out;
+}
+
+.chatbox_translate{
+    transform: translateX(0);
+}
+.main__controls__block {
+    display: flex;
+}
+
+.main__controls__button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 10px;
+    min-width: 80px;
+    cursor: pointer;
+}
+
+.main__controls__button:hover {
+    background-color: #343434;
+    border-radius: 5px;
+}
+
+.main__controls__button i {
+    font-size: 24px;
+}
+
+.main__right {
+    display: flex;
+    flex-direction: column;
+}
+
+.main__header {
+    padding-top: 5px;
+    color: #F5F5F5;
+    text-align: center;
+}
+
+.main__chat_window {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.messages {
+    color: white;
+    list-style: none;
+}
+
+.main__message_container {
+    padding: 22px 12px;
+    display: flex;
+}
+
+.main__message_container input {
+    flex-grow: 1;
+    background-color: #95272700;
+    border: none;
+    color: #ffffff;
+    border-bottom: 1px solid #007ee8;
+    margin-bottom: 5px;
+}
+
+.leave_meeting {
+    color: #EB534B;
+}
+
+.unmute,
+.stop {
+    color: #CC3B33;
+}
+
+.inner-prompt{
+    padding: 10px;
+}
+.alert-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.controls{
+    display: flex;
+    justify-content: end;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="icon" href="images/favicon-V.png"  sizes="16x16">
+  <link rel="stylesheet" href="css/style.css" />
+  <title>Voop Chat</title>
+</head>
+
+<body>
+  <div class="container">
+    <form id="home" method="POST">
+      <h1 style="text-transform: capitalize;">Hello <%= name?name:"User" %>
+      </h1>
+      <div class="form-control">
+        <label for="password" style="margin-left: 30px;"><span style="font-size: 20px;">Room Code</span></label>
+        <div class="box" style="display: flex;padding: 10px 30px;">
+          <input type="hidden" name="user" value="<%= name %>">
+          <input type="text" name="room_code" id="room_code" placeholder="Enter Room Code(8 digits)" />
+          <button disabled="true" id="submit" onclick="send()" style="background: transparent; border: none;">
+            <img src="images/next.svg" alt="" style="height: 30px;"></h1>
+          </button>
+          <small>Error message</small>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <script type="text/javascript">
+    var roomid;
+  </script>
+  <script type="text/javascript" src="./js/main_app.js"></script>
+  <script>
+    function send() {
+      roomid = document.querySelector("#room_code").value;
+      localStorage.setItem("code", String(roomid))
+      document.querySelector("#home").action = `/${document.querySelector("#room_code").value}`;
+      document.querySelector("#home").submit();
+    }
+    document.querySelector("#room_code").addEventListener("input" , e=>{
+      if(e.target.value.length == 8){
+        e.target.style.border = "1px solid #2ecc71"
+        document.querySelector("#submit").disabled = false
+      }
+      else{
+        e.target.style.border = "1px solid #e74c3c"
+        document.querySelector("#submit").disabled = "true"
+      }
+    })
+  </script>
+  <script src="js/script2.js"></script>
+</body>
+
+</html>
