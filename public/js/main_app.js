@@ -3,6 +3,7 @@ const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer();
 let myVideoStream;
 
+console.log(socket);
 
 const myVideo = document.createElement('video')
 myVideo.muted = true;

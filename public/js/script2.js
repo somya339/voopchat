@@ -4,7 +4,7 @@ const email = document.getElementById('email');
 const password = document.getElementById('password');
 const password2 = document.getElementById('password2');
 const btn = document.querySelector(".signup");
-// btn.disabled = true;
+btn.disabled = true;
 const success = [];
 setInterval(() => {
   let x = Math.floor(Math.random() * 11 + 1)
@@ -85,7 +85,7 @@ function checkPasswordsMatch(input1, input2) {
 function check_valid() {
   success.forEach(e => {
     if (e != 1) {
-      return
+      return 
     }
   })
   btn.disabled = false;
@@ -97,8 +97,8 @@ function getFieldName(input) {
 
 // Event listeners
 form.addEventListener("focusout", function (e) {
-  // e.preventDefault();
-  console.log("click");
+  e.preventDefault();
+  // console.log("click");
   checkRequired([username, email, password, password2]);
   checkLength(username, 3, 15);
   checkLength(password, 6, 25);

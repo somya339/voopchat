@@ -1,7 +1,7 @@
 const database = require('../utils/database').getdb;
 
 class signup {
-    constructor(name, email, password ,code) {
+    constructor(name, email, password, code) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -15,14 +15,34 @@ class signup {
             console.log(err);
         });
     }
-    static fetch(email, name, cb) {
+
+    static getName(name, cb) {
         let db = database();
         db.collection("DSC_test_base").findOne({
-            name: name,
-            email: email
-        }).then((result) => {
-            // console.log(result)
-            cb(result);
+            name: name
+        }).then(result => {
+            return cb(result);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
+    static fetch(email ,name , cb) {
+        let db = database();
+         db.collection("DSC_Test_base").findOne({
+            name : name
+        }).then( (result) => {
+            if(result){
+               return cb(1);
+            }
+            db.collection("DSC_Test_base").findOne({
+                email : email
+            }).then( response =>{
+                if(response){
+                    return cb(2);
+                }
+                cb(result);
+            })
         }).catch((err) => {
             console.log(err);
         });
@@ -37,13 +57,13 @@ class signup {
             console.log(err);
         });
     }
-    static delete_cred(code){
+    static delete_cred(code) {
         let db = database();
         db.collection("DSC_Test_base").deleteOne({
-            session_code : code
-        }).then((result) =>{
-            // console.log(result);
-        }).catch(err =>{
+            session_code: code
+        }).then((result) => {
+            console.log(result);
+        }).catch(err => {
             console.log(err);
         })
     }

@@ -1,29 +1,51 @@
 const mail = require('nodemailer');
 const bcrypt = require('bcrypt');
-let otp = Math.floor(Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + 4).toString();
-if (otp.length < 4) {
-    otp = "0" + otp;
-}
-let details;
-console.log(otp);
 //https://www.google.com/settings/security/lesssecureapps 
-
 const signup = require('../model/model');
+let otp;
 exports.getSignup = (req, res) => {
     res.render("index", {
         req: req,
         err: req.flash("err"),
         auth: req.flash("unauthorised"),
+        username: req.flash("User_Name_Exist") || "",
+        available: req.flash("User_Email_Exist") || ""
     });
 }
+
+exports.postCheck = (req, res) => {
+    signup.getName(req.body.username, result => {
+        if (result == null) {
+            return res.render("index", {
+                username: req.body.username,
+                available: "The user Name is unique!"
+            });
+        }
+        return res.render("index", {
+            username: "",
+            available: "oops! The username already exist."
+        })
+    })
+}
+
 exports.postSignup = (req, res) => {
     signup.fetch(req.body.email, req.body.username, (result) => {
-        if (result == null) {
+        // console.log(result);
+        if (result == "1") {
+            req.flash("User_Name_Exist", "The Username is already taken.");
+            res.redirect("/signup");
+        } else if (result == null) {
             // console.log(process.env.EMAIL , req.body.email);
+            otp = Math.floor(Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + 4).toString();
+            if (otp.length < 4) {
+                otp = "0" + otp;
+            }
+            let details;
+            console.log(otp);
             let transporter = mail.createTransport({
-                host : "smtp.gmail.com",
+                host: "smtp.gmail.com",
                 service: "gmail",
-                port: 465, 
+                port: 465,
                 secure: false,
                 auth: {
                     user: process.env.EMAIL,
@@ -48,13 +70,14 @@ exports.postSignup = (req, res) => {
                 }
             });
             bcrypt.hash(req.body.password, 12, (err, result) => {
-                res.locals.session_code = result;
+                // res.locals.session_code = result;
                 const model = new signup(req.body.username, req.body.email, result, otp);
                 model.save();
             })
             req.session.isLoggedIn = otp;
             res.redirect("/otp");
-        } else {
+        } else if (result == 2) {
+            req.flash("User_Email_Exist", "The Email is already registered");
             res.redirect("/signup");
         }
     })

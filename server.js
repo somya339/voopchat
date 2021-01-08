@@ -29,7 +29,6 @@ app.set("views", "views");
 app.set("view engine", "ejs");
 
 app.use(flash());
-
 app.use("/peerjs", peerServer);
 let room;
 
@@ -51,6 +50,6 @@ router.get("/", (req, res) => {
 app.use("/", router);
 mongo.connect(() => {
     server.listen(process.env.PORT || 3400, () => {
-        console.log("the server is running at port 3400");
+        console.log("The server is running at port 3400");
     });
 });

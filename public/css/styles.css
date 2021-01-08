@@ -24,6 +24,18 @@ video {
     width: 400px;
     background: #33333382;
 }
+@media(max-width : 450px){
+    video {
+        width: 80%;
+        background: #33333382;
+    }
+}@media(max-width : 750px){
+    video {
+        width: 45%;
+        background: #33333382;
+    }
+}
+
 
 .main-right {
     height: 100%;
@@ -111,7 +123,7 @@ img {
 .video-grid {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
 footer {
