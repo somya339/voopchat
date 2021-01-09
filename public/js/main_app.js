@@ -18,7 +18,7 @@ navigator.mediaDevices.getUserMedia({
   myPeer.on('call', call => {
     call.answer(stream);
     const video = document.createElement('video')
-    video.className = socket.id
+    // video.className = socket.id
     call.on('stream', userVideoStream => {
       addVideoStream(video ,userVideoStream)
     })
@@ -44,7 +44,7 @@ navigator.mediaDevices.getUserMedia({
 })
 
 document.querySelector(".leave_meeting").addEventListener("click", e => {
-  console.log("hello");
+  // console.log("hello");
   socket.emit("disconnect", socket.id)
 })
 socket.on('disconnect', userId => {
