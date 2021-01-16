@@ -12,7 +12,7 @@ navigator.mediaDevices.getUserMedia({
   video: Boolean(localStorage.getItem("video")),
   audio: Boolean(localStorage.getItem("audio"))
 }).then(stream => {
-  
+
   console.log(socket.id);
   myVideoStream = stream;
   addVideoStream(myVideo, stream)
@@ -86,7 +86,7 @@ socket.on('disconnect', userId => {
 
 
 myPeer.on('open', id => {
-  socket.emit('join-room', localStorage.getItem("code"), id, "Somya" /* (document.querySelector("#user_name").value)?document.querySelector("#user_name").value:"Someone" */ );
+  socket.emit('join-room', localStorage.getItem("code"), id,  (document.querySelector("#user_name").value)?document.querySelector("#user_name").value:"Someone" );
 })
 
 
@@ -108,7 +108,14 @@ function addVideoStream(video, stream) {
   video.addEventListener('loadedmetadata', () => {
     video.play()
   })
-  videoGrid.append(video)
+  let video_text = document.createElement("span")
+  video_text.textContent = document.querySelector("#user_name").value;
+  let video_div = document.createElement("div");
+  video_text.classList.add("name");
+  video_div.appendChild(video_text)
+  video_div.appendChild(video);
+  video_div.style.position = "relative"
+  videoGrid.append(video_div);
 }
 
 

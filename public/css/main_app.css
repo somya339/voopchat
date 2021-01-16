@@ -178,3 +178,12 @@ body {
 #deny {
     color: #CC3B33;
 }
+.name{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 8px;
+    color: white;
+    z-index: 2;
+    font-size: 20px;
+}
