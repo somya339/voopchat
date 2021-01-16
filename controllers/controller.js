@@ -64,8 +64,8 @@ exports.postSignup = (req, res) => {
             }, 200000);
             transporter.sendMail(mailoptions, (err, data) => {
                 if (err) {
-                    console.log(data);
-                    console.log(err);
+                    // console.log(data);
+                    // console.log(err);
                 } else {
                     console.log("MAIL sent!");
                 }
@@ -110,7 +110,7 @@ exports.getlogin = (req, res) => {
     });
 }
 exports.postLogin = (req, res) => {
-    console.log(req.body.username);
+    // console.log(req.body.username);
     let password = req.body.password
     signup.check_cred(req.body.username, (result) => {
         if (result) {
