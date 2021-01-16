@@ -21,6 +21,10 @@
     <script src="/socket.io/socket.io.js" defer></script>
     <link rel="stylesheet" href="css/main_app.css">
     <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <script>
+       var vid =  localStorage.getItem("video");
+       var aud =  localStorage.getItem("audio");
+    </script>
     <style>
         #video-grid {
             display: flex;
@@ -58,6 +62,21 @@
 </head>
 
 <body>
+    <div class="request-freez hid">
+        <div class="request-join">
+            <div class="inner-box">
+                <p class="info">
+                    <%= user||"Someone" %> has requested to join the meeting.
+                </p>
+                <form action="">
+                    <div class=permit>
+                        <button id="allow" class="allow">Allow</button>
+                        <button id="deny" class="deny">Deny</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="main">
         <div class="main__left">
             <div class="main__videos">
@@ -122,6 +141,12 @@
 </body>
 <script src="js/main_app.js" defer></script>
 <script>
+    document.querySelectorAll(".permit button").forEach(e => {
+        e.addEventListener("click", evt => {
+            evt.preventDefault();
+            document.querySelector(".request-freez").classList.add("hid");
+        })
+    })
     document.querySelector("#chat").addEventListener("click", e => {
         console.log(e.target);
         var chat_menu = document.querySelector("#chat_menu");

@@ -33,15 +33,37 @@ app.use("/peerjs", peerServer);
 let room;
 
 io.on("connection", socket => {
-    socket.on("join-room", (roomid, userId) => {
+    // The code to get socket ids
+    let clients = io.sockets.clients().connected;
+    let sockets = Object.values(clients);
+    let users = sockets.map(s => s.id);
+    console.log(users);
+
+    socket.on("join-room", (roomid, userId, username) => {
         socket.join(roomid);
         socket.to(roomid).broadcast.emit("user-connected", userId);
         socket.on("message", (message, user) => {
             io.to(roomid).emit("createMessage", message, user);
-        })
+        });
+
+        //     if (users.length > 1) {
+        //         socket.to(users[0]).emit("join-request" ,username , userId);
+        //         socket.on("status", grant => {
+        //             console.log("status recieved");
+        //             // if (grant == "allow") {
+        //             // }
+        //         });
+        //     } else {
+        //         socket.join(roomid);
+        //         socket.to(roomid).broadcast.emit("user-connected", userId);
+        //         socket.on("message", (message, user) => {
+        //             io.to(roomid).emit("createMessage", message, user);
+        //         })
+
+        //     }
+        // })
     })
 })
-
 router.get("/", (req, res) => {
     res.redirect(`/signup`)
 });

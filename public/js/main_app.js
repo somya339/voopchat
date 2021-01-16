@@ -9,18 +9,19 @@ const myVideo = document.createElement('video')
 myVideo.muted = true;
 const peers = {}
 navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
+  video: Boolean(localStorage.getItem("video")),
+  audio: Boolean(localStorage.getItem("audio"))
 }).then(stream => {
+  
   console.log(socket.id);
   myVideoStream = stream;
-  addVideoStream(myVideo,stream)
+  addVideoStream(myVideo, stream)
   myPeer.on('call', call => {
     call.answer(stream);
     const video = document.createElement('video')
     // video.className = socket.id
     call.on('stream', userVideoStream => {
-      addVideoStream(video ,userVideoStream)
+      addVideoStream(video, userVideoStream)
     })
   })
 
@@ -40,6 +41,7 @@ navigator.mediaDevices.getUserMedia({
     let child = document.createElement("li");
     child.innerHTML = `<b>${user}</b><br/>${message}`
     document.querySelector("ul").appendChild(child);
+    document.querySelector("ul").scrollIntoView(false);
   })
 })
 
@@ -50,8 +52,8 @@ document.querySelector(".leave_meeting").addEventListener("click", e => {
 socket.on('disconnect', userId => {
   console.log("hello");
   if (peers[userId]) {
-    document.querySelector(".video-grid").childNodes.forEach( e =>{
-      if(userId == e.classList[0]){
+    document.querySelector(".video-grid").childNodes.forEach(e => {
+      if (userId == e.classList[0]) {
 
         videoGrid.removeChild(e);
       }
@@ -60,9 +62,31 @@ socket.on('disconnect', userId => {
   }
 })
 
+// requesting to join room
+
+
+
+// socket.on('join-request', async (username , userId) => {
+//   console.log("hello");
+//   document.querySelector(".request-freez").classList.remove("hid");
+//   let btns = document.querySelectorAll(".permit button")
+//   btns.forEach(e => {
+//     e.addEventListener("click", evt => {
+//       if (evt.target.classList[0] == "allow") {
+//         console.log(evt.target.classList[0]);
+//         socket.to(userId).emit("status", "allow");
+//       } else {
+//         socket.emit("status", "deny");
+//       }
+//     })
+//   })
+// })
+
+
+
 
 myPeer.on('open', id => {
-  socket.emit('join-room', localStorage.getItem("code"), id)
+  socket.emit('join-room', localStorage.getItem("code"), id, "Somya" /* (document.querySelector("#user_name").value)?document.querySelector("#user_name").value:"Someone" */ );
 })
 
 
@@ -79,7 +103,7 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call
 }
 
-function addVideoStream(video ,stream) {
+function addVideoStream(video, stream) {
   video.srcObject = stream
   video.addEventListener('loadedmetadata', () => {
     video.play()
@@ -89,10 +113,10 @@ function addVideoStream(video ,stream) {
 
 
 
-const scrollToBottom = () => {
-  var d = document.querySelector('.main__chat_window');
-  d.scrollTop = d.scrollHeight;
-}
+// const scrollToBottom = () => {
+//   var d = document.querySelector('.main__chat_window');
+//   d.scrollTop = d.scrollHeight;
+// }
 
 
 const muteUnmute = () => {
