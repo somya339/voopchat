@@ -1,5 +1,6 @@
 const mail = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 //https://www.google.com/settings/security/lesssecureapps 
 const signup = require('../model/model');
 let otp;
@@ -144,8 +145,9 @@ exports.postVideo = (req, res) => {
 
 
 exports.getHome = (req, res) => {
-    // req.session.isLoggedIn = false;
+
     res.render("home", {
-        name: req.session.name
+        name: req.session.name,
+        uuid: uuidv4()
     })
 }

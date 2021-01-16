@@ -1,7 +1,8 @@
-body{
+body {
     overflow-x: hidden;
     overflow-y: scroll;
 }
+
 .main {
     height: 100vh;
     display: flex;
@@ -31,6 +32,7 @@ body{
     justify-content: center;
     align-items: center;
     padding: 40px;
+    border: 3px solid #1C1E20;
 }
 
 .main__controls {
@@ -49,9 +51,10 @@ body{
     transition: all 500ms ease-in-out;
 }
 
-.chatbox_translate{
+.chatbox_translate {
     transform: translateX(0);
 }
+
 .main__controls__block {
     display: flex;
 }
@@ -119,15 +122,68 @@ body{
     color: #CC3B33;
 }
 
-.inner-prompt{
+.inner-prompt {
     padding: 10px;
 }
-.alert-box{
+
+.alert-box {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
-.controls{
+
+.controls {
     display: flex;
     justify-content: end;
+}
+
+.request-freez {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+.hid {
+    visibility: hidden;
+}
+
+.request-join {
+    background-color: #3D3D42;
+    border-radius: 10px;
+}
+
+.inner-box {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+}
+
+.inner-box div button {
+    border: none;
+    background-color: transparent;
+}
+
+#allow {
+    color: #007ee8;
+}
+
+#deny {
+    color: #CC3B33;
+}
+.name{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 8px;
+    color: white;
+    z-index: 2;
+    font-size: 20px;
 }
