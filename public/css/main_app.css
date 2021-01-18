@@ -55,6 +55,16 @@ body {
     transform: translateX(0);
 }
 
+@media(min-width:1024px) {
+    .main__right {
+        flex: 0.2;
+        position: absolute;
+        height: 100%;
+        width: 200px;
+        right: 0;
+    }
+}
+
 .main__controls__block {
     display: flex;
 }
@@ -178,7 +188,8 @@ body {
 #deny {
     color: #CC3B33;
 }
-.name{
+
+.name {
     position: absolute;
     bottom: 0;
     right: 0;
