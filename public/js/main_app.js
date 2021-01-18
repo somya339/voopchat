@@ -9,8 +9,8 @@ const myVideo = document.createElement('video')
 myVideo.muted = true;
 const peers = {}
 navigator.mediaDevices.getUserMedia({
-  video: Boolean(localStorage.getItem("video")),
-  audio: Boolean(localStorage.getItem("audio"))
+  video: true,
+  audio: true
 }).then(stream => {
 
   console.log(socket.id);
@@ -118,12 +118,6 @@ function addVideoStream(video, stream) {
   videoGrid.append(video_div);
 }
 
-
-
-// const scrollToBottom = () => {
-//   var d = document.querySelector('.main__chat_window');
-//   d.scrollTop = d.scrollHeight;
-// }
 
 
 const muteUnmute = () => {

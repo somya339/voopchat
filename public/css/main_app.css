@@ -55,7 +55,7 @@ body {
     transform: translateX(0);
 }
 
-@media(min-width:1024px) {
+@media(min-width:1024){
     .main__right {
         flex: 0.2;
         position: absolute;
@@ -188,8 +188,7 @@ body {
 #deny {
     color: #CC3B33;
 }
-
-.name {
+.name{
     position: absolute;
     bottom: 0;
     right: 0;

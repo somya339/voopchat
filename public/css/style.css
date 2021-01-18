@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
 :root {
   --success-color: #2ecc71;
   --error-color: #e74c3c;
@@ -56,8 +57,8 @@ h2 {
 }
 
 .form-control {
-  margin-bottom: 10px;
-  padding-bottom: 20px;
+  margin-bottom: 15px;
+  padding-bottom: 35px;
   position: relative;
 }
 
@@ -93,7 +94,7 @@ h2 {
   color: var(--error-color);
   position: absolute;
   bottom: 0;
-  left: 0;
+  /* left: 0; */
   visibility: hidden;
 }
 
@@ -101,7 +102,7 @@ h2 {
   visibility: visible;
 }
 
-.form  button {
+.form button {
   cursor: pointer;
   background-color: #3498db;
   border: 2px solid #3498db;
@@ -142,7 +143,8 @@ p {
 .wrap {
   display: flex;
 }
-.media:focus{
+
+.media:focus {
   outline: none;
   border: none;
 }
