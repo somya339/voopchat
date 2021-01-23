@@ -3,14 +3,16 @@ const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer();
 let myVideoStream;
 
-console.log(socket);
+// console.log(socket);
 
 const myVideo = document.createElement('video')
 myVideo.muted = true;
+const myScreen = document.createElement('video');
+myScreen.muted = true;
 const peers = {}
 navigator.mediaDevices.getUserMedia({
-  video: Boolean(localStorage.getItem("video")),
-  audio: Boolean(localStorage.getItem("audio"))
+  video: true,
+  audio: true
 }).then(stream => {
 
   console.log(socket.id);
@@ -28,6 +30,25 @@ navigator.mediaDevices.getUserMedia({
   socket.on('user-connected', userId => {
     connectToNewUser(userId, stream)
   })
+
+  document.querySelector("#screen-share").addEventListener("click", evt => {
+    navigator.mediaDevices.getDisplayMedia({
+      audio: false,
+      video: true
+    }).then(
+      stream => {
+        addVideoStream(myScreen, stream);
+        socket.emit('join-room', localStorage.getItem("code"), socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
+        socket.on('user-connected', userId => {
+          connectToNewUser(userId, stream)
+        })
+        // connectToNewUser(myScreen);
+        // socket.emit("screen" , socket.id =>{
+        // } )
+      }
+    )
+  })
+
   document.addEventListener("keypress", (evt) => {
     if (evt.keyCode == 13) {
       let text = document.querySelector("#chat_message").value;
@@ -44,6 +65,9 @@ navigator.mediaDevices.getUserMedia({
     document.querySelector("ul").scrollIntoView(false);
   })
 })
+
+
+
 
 document.querySelector(".leave_meeting").addEventListener("click", e => {
   // console.log("hello");
@@ -86,7 +110,7 @@ socket.on('disconnect', userId => {
 
 
 myPeer.on('open', id => {
-  socket.emit('join-room', localStorage.getItem("code"), id,  (document.querySelector("#user_name").value)?document.querySelector("#user_name").value:"Someone" );
+  socket.emit('join-room', localStorage.getItem("code"), id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
 })
 
 
@@ -118,12 +142,6 @@ function addVideoStream(video, stream) {
   videoGrid.append(video_div);
 }
 
-
-
-// const scrollToBottom = () => {
-//   var d = document.querySelector('.main__chat_window');
-//   d.scrollTop = d.scrollHeight;
-// }
 
 
 const muteUnmute = () => {

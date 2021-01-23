@@ -23,7 +23,7 @@
           background-size: contain;
           background-repeat: no-repeat;
           background-position: right;" />
-          <small id="success">Error message</small>
+          <small id="success" style="bottom: -10px;">Error message</small>
         </div>
       </div>
       <div class="form-control">
@@ -34,7 +34,7 @@
           <button disabled="true" id="submit" onclick="send()" style="background: transparent; border: none;">
             <img src="images/next.svg" alt="" style="height: 30px;"></h1>
           </button>
-          <small>Error message</small>
+          <!-- <small style="visibility : visible; margin-top :20px; color : lightsteelblue; padding: 5px;">If you want a random room code then you may enter in the above field.The minimun code lenght is 10.</small> -->
         </div>
         <!-- <div class="media-controls">
           <div class="video form" style="display: flex; padding: 10px; align-items: baseline; width: 50%;">
@@ -59,23 +59,11 @@
     function send() {
       roomid = document.querySelector("#room_code").value;
       localStorage.setItem("code", String(roomid));
-      // if(document.querySelector(".media").value = "flase"){
-      //   localStorage.setItem("video" , "false");
-      // }
-      // else{
-      //   localStorage.setItem("video" , "true");
-      // }
-      // if(document.querySelectorAll(".media")[1].value = "flase"){
-      //   localStorage.setItem("audio" , "false");
-      // }
-      // else{
-      //   localStorage.setItem("audio" , "true");
-      // }
       document.querySelector("#home").action = `/${document.querySelector("#room_code").value}`;
       document.querySelector("#home").submit();
     }
     document.querySelector("#room_code").addEventListener("input", e => {
-      if (e.target.value.length > 20) {
+      if (e.target.value.length > 9) {
         e.target.style.border = "1px solid #2ecc71"
         document.querySelector("#submit").disabled = false
       }
