@@ -55,7 +55,7 @@ body {
     transform: translateX(0);
 }
 
-@media(min-width:1024){
+@media(min-width:1024px) {
     .main__right {
         flex: 0.2;
         position: absolute;
@@ -63,6 +63,18 @@ body {
         width: 200px;
         right: 0;
     }
+}
+
+.shrink {
+    visibility: visible;
+}
+
+@media(max-width : 525px) {
+    .shrink {
+        visibility: hidden;
+        width: 0%
+    }
+
 }
 
 .main__controls__block {
@@ -188,7 +200,8 @@ body {
 #deny {
     color: #CC3B33;
 }
-.name{
+
+.name {
     position: absolute;
     bottom: 0;
     right: 0;

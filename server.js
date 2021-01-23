@@ -63,6 +63,9 @@ io.on("connection", socket => {
         //     }
         // })
     })
+
+
+    // socket.on("screen" , )
 })
 router.get("/", (req, res) => {
     res.redirect(`/signup`)
