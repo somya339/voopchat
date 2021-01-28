@@ -1,6 +1,6 @@
 # voopchat
 A fully functional video conferencing and chatting webapp
-https://immense-fortress-09195.herokuapp.com/signup
+https://git.heroku.com/obscure-island-77958.git
 
 # Technologies
 This Web Appication is build using many technologies of nodejs enviornment 
