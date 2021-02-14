@@ -1,46 +1,83 @@
 const socket = io();
 const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer();
+// var myPeer
 let myVideoStream;
-
-// console.log(socket);
-
+var newUser;
 const myVideo = document.createElement('video')
 myVideo.muted = true;
 const myScreen = document.createElement('video');
 myScreen.muted = true;
-const peers = {}
-navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
-}).then(stream => {
+var peers = {}
+// var socket_info = [];
 
-  console.log(socket.id);
-  myVideoStream = stream;
-  addVideoStream(myVideo, stream)
-  myPeer.on('call', call => {
-    call.answer(stream);
-    const video = document.createElement('video')
-    // video.className = socket.id
-    call.on('stream', userVideoStream => {
-      addVideoStream(video, userVideoStream)
+myPeer.on('open', peerid => {
+  console.log(peerid);
+  // Video Sharing 
+  navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+  }).then(stream => {
+    socket.emit('join-room-success', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
+    socket.emit("store-user", stream.id);
+    socket.on('user-connected', (peerid, socId) => {
+      console.log("join success");
+      connectToNewUser(peerid, socId, stream);
+    })
+    myVideoStream = stream;
+    myVideo.classList.add(stream.id);
+    addVideoStream(myVideo, stream)
+    myPeer.on('call', call => {
+      const video = document.createElement('video')
+      call.answer(stream);
+      call.on('stream', userVideoStream => {
+        video.classList.add(userVideoStream.id);
+        addVideoStream(video, userVideoStream)
+      })
+    })
+    // Sending Message
+    document.addEventListener("keypress", (evt) => {
+      if (evt.keyCode == 13) {
+        let text = document.querySelector("#chat_message").value;
+        if (text != "" || null || undefined) {
+          socket.emit("message", text, document.querySelector("#user_name").value);
+          document.querySelector("#chat_message").value = "";
+        }
+      };
+    })
+    socket.on("createMessage", (message, user) => {
+      let child = document.createElement("li");
+      child.innerHTML = `<b>${user}</b><br/>${message}`
+      document.querySelector("ul").appendChild(child);
+      document.querySelector("ul").scrollIntoView(false);
     })
   })
 
-  socket.on('user-connected', userId => {
-    connectToNewUser(userId, stream)
-  })
-
+  // Screen Sharing
   document.querySelector("#screen-share").addEventListener("click", evt => {
     navigator.mediaDevices.getDisplayMedia({
       audio: false,
       video: true
     }).then(
       stream => {
+        stream.getVideoTracks()[0].onended = () => {
+          console.log("screen stopped");
+          console.log(socket.id);
+          socket.emit("screen-disconnect", socket.id, stream.id, localStorage.getItem("code"));
+        }
+        socket.emit('join-room-success', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
         addVideoStream(myScreen, stream);
-        socket.emit('join-room', localStorage.getItem("code"), socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
-        socket.on('user-connected', userId => {
-          connectToNewUser(userId, stream)
+        socket.on('user-connected', (peerid, socId) => {
+          connectToNewUser(peerid, socId, stream);
+          socket.emit("store-user", stream.id);
+          myPeer.on('call', call => {
+            const video = document.createElement('video')
+            call.answer(stream);
+            call.on('stream', userVideoStream => {
+              video.classList.add(userVideoStream.id);
+              addVideoStream(video, userVideoStream)
+            })
+          })
         })
         // connectToNewUser(myScreen);
         // socket.emit("screen" , socket.id =>{
@@ -48,83 +85,58 @@ navigator.mediaDevices.getUserMedia({
       }
     )
   })
-
-  document.addEventListener("keypress", (evt) => {
-    if (evt.keyCode == 13) {
-      let text = document.querySelector("#chat_message").value;
-      if (text != "" || null || undefined) {
-        socket.emit("message", text, document.querySelector("#user_name").value);
-        document.querySelector("#chat_message").value = "";
-      }
-    };
-  })
-  socket.on("createMessage", (message, user) => {
-    let child = document.createElement("li");
-    child.innerHTML = `<b>${user}</b><br/>${message}`
-    document.querySelector("ul").appendChild(child);
-    document.querySelector("ul").scrollIntoView(false);
-  })
+  // console.log(localStorage.getItem("code"));
+  // socket.emit('join-request', localStorage.getItem("code"), peerid, socket.id);
+  // socket.on("join-room", (peerid, socketId) => {
+  //   document.querySelector(".request-freez").classList.remove("hid");
+  //   console.log("hello");
+  //   let btns = document.querySelectorAll(".permit button")
+  //   btns.forEach(e => {
+  //     e.addEventListener("click", evt => {
+  //       if (evt.target.classList[0] == "allow") {
+  //         console.log(evt.target.classList[0]);
+  //         console.log(peerid);
+  //         socket.emit("permission-allowed", peerid, socketId)
+  //         socket.on("now-connect-to-room", (peerid, socketId) => {
+  //           console.log("yes");
+  //         })
+  //         // socket.emit("status", "allow");
+  //       } else {
+  //         socket.emit("join-room-faliure", "deny");
+  //       }
+  //     })
+  //   })
+  // })
 })
 
-
-
-
-document.querySelector(".leave_meeting").addEventListener("click", e => {
-  // console.log("hello");
-  socket.emit("disconnect", socket.id)
-})
-socket.on('disconnect', userId => {
-  console.log("hello");
+socket.on('user-disconnect', (userId, streamId) => {
+  // socket.emit("disconnect-user-found", userId);
+  console.log(streamId);
+  document.querySelectorAll(".video").forEach(e => {
+    console.log(e);
+    // var userStreamId = socket_info.get(userId);
+    if (e.classList.contains(streamId)) {
+      videoGrid.removeChild(e);
+    }
+  })
   if (peers[userId]) {
-    document.querySelector(".video-grid").childNodes.forEach(e => {
-      if (userId == e.classList[0]) {
-
-        videoGrid.removeChild(e);
-      }
-    })
     peers[userId].close()
   }
 })
 
-// requesting to join room
-
-
-
-// socket.on('join-request', async (username , userId) => {
-//   console.log("hello");
-//   document.querySelector(".request-freez").classList.remove("hid");
-//   let btns = document.querySelectorAll(".permit button")
-//   btns.forEach(e => {
-//     e.addEventListener("click", evt => {
-//       if (evt.target.classList[0] == "allow") {
-//         console.log(evt.target.classList[0]);
-//         socket.to(userId).emit("status", "allow");
-//       } else {
-//         socket.emit("status", "deny");
-//       }
-//     })
-//   })
-// })
-
-
-
-
-myPeer.on('open', id => {
-  socket.emit('join-room', localStorage.getItem("code"), id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
-})
-
-
-function connectToNewUser(userId, stream) {
-  const call = myPeer.call(userId, stream)
+// Connecting New User
+function connectToNewUser(peerid, socId, stream) {
+  const call = myPeer.call(peerid, stream)
   const video = document.createElement('video')
+  video.classList.add(stream.id);
   call.on('stream', userVideoStream => {
     addVideoStream(video, userVideoStream)
   })
+
   call.on('close', () => {
     video.remove()
   })
-
-  peers[userId] = call
+  peers[peerid] = call
 }
 
 function addVideoStream(video, stream) {
@@ -139,6 +151,8 @@ function addVideoStream(video, stream) {
   video_div.appendChild(video_text)
   video_div.appendChild(video);
   video_div.style.position = "relative"
+  video_div.classList.add("video");
+  video_div.classList.add(stream.id);
   videoGrid.append(video_div);
 }
 
