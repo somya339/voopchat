@@ -60,7 +60,6 @@ function checkLength(input, min, max) {
       input,
       `${getFieldName(input)} must be at least ${min} characters`
     );
-    e.preventDefault();
   } else if (input.value.length > max) {
     success[2] = 0;
     showError(
@@ -76,7 +75,7 @@ function checkLength(input, min, max) {
 // Check passwords match
 function checkPasswordsMatch(input1, input2) {
   if (input1.value !== input2.value) {
-    success[2] = 1;
+    success[2] = 0;
     check_valid();
     showError(input2, 'Passwords do not match');
   }
@@ -85,7 +84,7 @@ function checkPasswordsMatch(input1, input2) {
 function check_valid() {
   success.forEach(e => {
     if (e != 1) {
-      return 
+      return
     }
   })
   btn.disabled = false;
@@ -95,13 +94,14 @@ function getFieldName(input) {
   return input.id.charAt(0).toUpperCase() + input.id.slice(1);
 }
 
+
+
 // Event listeners
 form.addEventListener("focusout", function (e) {
   e.preventDefault();
   // console.log("click");
-  checkRequired([username, email, password, password2]);
-  checkLength(username, 3, 15);
-  checkLength(password, 6, 25);
-  checkEmail(email);
-  checkPasswordsMatch(password, password2);
+  console.log(e.target);
+  (e.target.id == "username") ? checkLength(username, 3, 15, e): (e.target.id == "email") ? checkEmail(email) :
+    (e.target.id == "password") ? checkLength(password, 5, 15) :
+    (e.target.id == "password2") ? checkPasswordsMatch(password, password2) : console.log(false);;
 });

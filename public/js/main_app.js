@@ -10,78 +10,98 @@ myVideo.muted = true;
 const myScreen = document.createElement('video');
 myScreen.muted = true;
 const peers = {}
-navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
-}).then(stream => {
+var peers_id = [];
+myPeer.on('open', peerid => {
+  socket.emit('join-room', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
+  navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+  }).then(stream => {
+    socket.emit("store-user", stream.id);
+    myVideoStream = stream;
+    myVideo.classList.add(stream.id);
+    addVideoStream(myVideo, stream)
+    myPeer.on('call', call => {
+      call.answer(stream);
+      const video = document.createElement('video')
+      // video.className = socket.id
+      call.on('stream', userVideoStream => {
+        addVideoStream(video, userVideoStream)
+      })
+    })
+    socket.on('user-connected', (peerid, sockectId) => {
+      connectToNewUser(peerid, sockectId, stream)
+    })
 
-  console.log(socket.id);
-  myVideoStream = stream;
-  addVideoStream(myVideo, stream)
-  myPeer.on('call', call => {
-    call.answer(stream);
-    const video = document.createElement('video')
-    // video.className = socket.id
-    call.on('stream', userVideoStream => {
-      addVideoStream(video, userVideoStream)
+
+    document.querySelector("#screen-share").addEventListener("click", evt => {
+      navigator.mediaDevices.getDisplayMedia({
+        audio: false,
+        video: true
+      }).then(
+        stream => {
+          addVideoStream(myScreen, stream);
+          stream.getVideoTracks()[0].onended = () => {
+            console.log("screen stopped");
+            console.log(socket.id);
+            socket.emit("screen-disconnect", socket.id, stream.id, localStorage.getItem("code"));
+          }
+          socket.emit('join-room', localStorage.getItem("code"), socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
+          socket.emit("store-user", stream.id);
+          socket.on('user-connected', (peerid, sockectId, username) => {
+            connectToNewUser(peerid, sockectId, stream)
+          })
+          // connectToNewUser(myScreen);
+          // socket.emit("screen" , socket.id =>{
+          // } )
+        }
+      )
+    })
+
+    document.addEventListener("keypress", (evt) => {
+      if (evt.keyCode == 13) {
+        let text = document.querySelector("#chat_message").value;
+        if (text != "" || null || undefined) {
+          socket.emit("message", text, document.querySelector("#user_name").value);
+          document.querySelector("#chat_message").value = "";
+        }
+      };
+    })
+    socket.on("createMessage", (message, user) => {
+      let child = document.createElement("li");
+      child.innerHTML = `<b>${user}</b><br/>${message}`
+      document.querySelector("ul").appendChild(child);
+      document.querySelector("ul").scrollIntoView(false);
     })
   })
+})
 
-  socket.on('user-connected', userId => {
-    connectToNewUser(userId, stream)
-  })
-
-  document.querySelector("#screen-share").addEventListener("click", evt => {
-    navigator.mediaDevices.getDisplayMedia({
-      audio: false,
-      video: true
-    }).then(
-      stream => {
-        addVideoStream(myScreen, stream);
-        socket.emit('join-room', localStorage.getItem("code"), socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
-        socket.on('user-connected', userId => {
-          connectToNewUser(userId, stream)
-        })
-        // connectToNewUser(myScreen);
-        // socket.emit("screen" , socket.id =>{
-        // } )
-      }
-    )
-  })
-
-  document.addEventListener("keypress", (evt) => {
-    if (evt.keyCode == 13) {
-      let text = document.querySelector("#chat_message").value;
-      if (text != "" || null || undefined) {
-        socket.emit("message", text, document.querySelector("#user_name").value);
-        document.querySelector("#chat_message").value = "";
-      }
-    };
-  })
-  socket.on("createMessage", (message, user) => {
-    let child = document.createElement("li");
-    child.innerHTML = `<b>${user}</b><br/>${message}`
-    document.querySelector("ul").appendChild(child);
-    document.querySelector("ul").scrollIntoView(false);
+socket.on("remove-screen", stream => {
+  document.querySelectorAll(".video").forEach(e => {
+    console.log(e);
+    // var userStreamId = socket_info.get(userId);
+    if (e.classList.contains(stream)) {
+      videoGrid.removeChild(e);
+    }
   })
 })
 
 
 
-
-document.querySelector(".leave_meeting").addEventListener("click", e => {
-  // console.log("hello");
-  socket.emit("disconnect", socket.id)
-})
+// document.querySelector(".leave_meeting").addEventListener("click", e => {
+//   // console.log("hello");
+//   socket.emit("disconnect", socket.id)
+// })
 socket.on('disconnect', userId => {
   console.log("hello");
+  document.querySelectorAll(".video").forEach(e => {
+    console.log(e);
+    // var userStreamId = socket_info.get(userId);
+    if (e.classList.contains(streamId)) {
+      videoGrid.removeChild(e);
+    }
+  })
   if (peers[userId]) {
-    document.querySelector(".video-grid").childNodes.forEach(e => {
-      if (userId == e.classList[0]) {
-
-        videoGrid.removeChild(e);
-      }
-    })
     peers[userId].close()
   }
 })
@@ -109,14 +129,12 @@ socket.on('disconnect', userId => {
 
 
 
-myPeer.on('open', id => {
-  socket.emit('join-room', localStorage.getItem("code"), id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
-})
 
 
-function connectToNewUser(userId, stream) {
-  const call = myPeer.call(userId, stream)
+function connectToNewUser(peerid, sockectId, stream) {
+  const call = myPeer.call(peerid, stream)
   const video = document.createElement('video')
+  video.classList.add(stream.id);
   call.on('stream', userVideoStream => {
     addVideoStream(video, userVideoStream)
   })
@@ -124,7 +142,7 @@ function connectToNewUser(userId, stream) {
     video.remove()
   })
 
-  peers[userId] = call
+  peers[peerid] = call
 }
 
 function addVideoStream(video, stream) {
@@ -139,6 +157,7 @@ function addVideoStream(video, stream) {
   video_div.appendChild(video_text)
   video_div.appendChild(video);
   video_div.style.position = "relative"
+  video_div.classList.add(stream.id);
   videoGrid.append(video_div);
 }
 

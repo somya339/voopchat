@@ -24,14 +24,14 @@
               <%= auth %>
             </p>
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" placeholder="Enter username" />
+            <input type="text" name="username" id="username" placeholder="Enter username"  autocomlete="off"/>
             <small>
               <%= username %>
             </small>
         </div>
         <div class='form-control <%= (available!="" )?" error":""%>'>
           <label for="email">Email</label>
-          <input type="text" name="email" id="email" placeholder="Enter email" />
+          <input type="text" name="email" id="email" placeholder="Enter email" autocomlete="off"/>
           <small>
             <%= available %>
           </small>
