@@ -1,5 +1,7 @@
 const express = require('express');
 const app = require('express')();
+const env = require('dotenv');
+env.config();
 const server = require('http').Server(app);
 const path = require('path');
 const mongo = require('./utils/database');
@@ -7,11 +9,7 @@ const router = require('./router/router');
 const body = require('body-parser');
 const flash = require('express-flash');
 const session = require('express-session');
-const env = require('dotenv');
 const io = require('socket.io')(server);
-const xss = require("xss-clean");
-const morgan = require('morgan');
-env.config();
 const {
     ExpressPeerServer
 } = require('peer');
@@ -29,25 +27,22 @@ app.use(body.urlencoded({
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", "views");
 app.set("view engine", "ejs");
-app.use(morgan('tiny'));
-
-// app.use(xss());
 app.use(flash());
 app.use("/peerjs", peerServer);
 let room;
 
 io.on("connection", socket => {
     var db = mongo.getdb();
-
+    console.log(socket);
     // The code to get socket ids
-    let clients = io.sockets.clients().connected;
-    let sockets = Object.values(clients);
-    let users = sockets.map(s => s.id);
-    console.log(users);
+    // let clients = io.sockets.clients().connected;
+    // let sockets = Object.values(clients);
+    // let users = sockets.map(s => s.id);
+    // console.log(users);
 
     socket.on("join-room", (roomid, peerid, socketId, username) => {
         socket.join(roomid);
-        socket.to(roomid).broadcast.emit("user-connected", peerid, socketId, username);
+        socket.to(roomid).emit("user-connected", peerid, socketId, username);
         socket.on("message", (message, user) => {
             io.to(roomid).emit("createMessage", message, user);
         });

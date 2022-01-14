@@ -6,6 +6,8 @@ const {
 //https://www.google.com/settings/security/lesssecureapps 
 const signup = require('../model/model');
 let otp;
+const sgMail=require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 exports.getSignup = (req, res) => {
     res.render("index", {
         req: req,
@@ -45,35 +47,20 @@ exports.postSignup = (req, res) => {
             }
             let details;
             console.log(otp);
-            let transporter = mail.createTransport({
-                host: "smtp.gmail.com",
-                service: "gmail",
-                port: 465,
-                secure: false,
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.PASSWORD
-                }
-            })
-            let mailoptions = {
-                from: process.env.EMAIL,
-                to: `${req.body.email}`,
-                subject: "VOOP Chat",
-                html: `<p>Your OTP is</p> ${otp}`
-            };
             setTimeout(() => {
                 otp = "";
             }, 200000);
-            transporter.sendMail(mailoptions, (err, data) => {
-                if (err) {
-                    // console.log(data);
-                    // console.log(err);
-                } else {
-                    console.log("MAIL sent!");
-                }
-            });
+            sgMail.send({
+                to:req.body.email,
+                from:'nodejsappdevops@gmail.com',
+                subject:'verify your email',
+                html:`
+                    <p>Please enter this OTP <br>${otp}<br>on the prompt to verify your email</p>
+                `
+            })
+            .then(()=>{console.log("sent to "+req.body.email);})
+            .catch(err=>{console.log(err);})
             bcrypt.hash(req.body.password, 12, (err, result) => {
-                // res.locals.session_code = result;
                 const model = new signup(req.body.username, req.body.email, result, otp);
                 model.save();
             })
