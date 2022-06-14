@@ -10,23 +10,30 @@ const myScreen = document.createElement('video');
 myScreen.muted = true;
 var peers = {}
 // var socket_info = [];
-
+var user_name = new Object();
 myPeer.on('open', peerid => {
-  console.log(peerid);
   // Video Sharing 
   navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
   }).then(stream => {
-    socket.emit('join-room-success', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
+    socket.emit('join-room-success', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone", false);
     socket.emit("store-user", stream.id);
-    socket.on('user-connected', (peerid, socId) => {
+    // count++;
+    // user_name["names"].push(document.querySelector("#user_name").value);
+    // localStorage.setItem("names" , user_name.toString());
+    // localStorage.getItem("names-list" , )
+    socket.on('user-connected', (peerid, socId, isScreen) => {
+
+      console.log("isScreen", isScreen);
       console.log("join success");
-      connectToNewUser(peerid, socId, stream);
+      connectToNewUser(peerid, socId, stream , false);
+      if (!isScreen) {
+      }
     })
     myVideoStream = stream;
     myVideo.classList.add(stream.id);
-    addVideoStream(myVideo, stream)
+    addVideoStream(myVideo, stream);
     myPeer.on('call', call => {
       const video = document.createElement('video')
       call.answer(stream);
@@ -55,36 +62,28 @@ myPeer.on('open', peerid => {
 
   // Screen Sharing
   document.querySelector("#screen-share").addEventListener("click", evt => {
-    navigator.mediaDevices.getDisplayMedia({
-      audio: false,
-      video: true
-    }).then(
-      stream => {
-        stream.getVideoTracks()[0].onended = () => {
-          console.log("screen stopped");
-          console.log(socket.id);
-          socket.emit("screen-disconnect", socket.id, stream.id, localStorage.getItem("code"));
-        }
-        socket.emit('join-room-success', localStorage.getItem("code"), peerid, socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
-        addVideoStream(myScreen, stream);
-        socket.on('user-connected', (peerid, socId) => {
-          connectToNewUser(peerid, socId, stream);
+      navigator.mediaDevices.getDisplayMedia({
+        audio: false,
+        video: true
+      }).then(
+        stream => {
+          addVideoStream(myScreen, stream);
+          stream.getVideoTracks()[0].onended = () => {
+            console.log("screen stopped");
+            console.log(socket.id);
+            socket.emit("screen-disconnect", socket.id, stream.id, localStorage.getItem("code"));
+          }
+          socket.emit('join-room', localStorage.getItem("code"), socket.id, (document.querySelector("#user_name").value) ? document.querySelector("#user_name").value : "Someone");
           socket.emit("store-user", stream.id);
-          myPeer.on('call', call => {
-            const video = document.createElement('video')
-            call.answer(stream);
-            call.on('stream', userVideoStream => {
-              video.classList.add(userVideoStream.id);
-              addVideoStream(video, userVideoStream)
-            })
+          socket.on('user-connected', (peerid, sockectId, username) => {
+            connectToNewUser(peerid, sockectId, stream)
           })
-        })
-        // connectToNewUser(myScreen);
-        // socket.emit("screen" , socket.id =>{
-        // } )
-      }
-    )
-  })
+          // connectToNewUser(myScreen);
+          // socket.emit("screen" , socket.id =>{
+          // } )
+        }
+      )
+    })
   // console.log(localStorage.getItem("code"));
   // socket.emit('join-request', localStorage.getItem("code"), peerid, socket.id);
   // socket.on("join-room", (peerid, socketId) => {
@@ -123,10 +122,17 @@ socket.on('user-disconnect', (userId, streamId) => {
     peers[userId].close()
   }
 })
-
+socket.on("close-screen", () => {
+  console.log("closed");
+})
 // Connecting New User
-function connectToNewUser(peerid, socId, stream) {
-  const call = myPeer.call(peerid, stream)
+function connectToNewUser(peerid, socId, stream, isScreen) {
+  var call;
+  if (isScreen) {
+    call = myPeer.call(peerid, undefined);
+  } else {
+    call = myPeer.call(peerid, stream)
+  }
   const video = document.createElement('video')
   video.classList.add(stream.id);
   call.on('stream', userVideoStream => {
@@ -139,24 +145,31 @@ function connectToNewUser(peerid, socId, stream) {
   peers[peerid] = call
 }
 
-function addVideoStream(video, stream) {
+function addVideoStream(video, stream, isScreen) {
   video.srcObject = stream
   video.addEventListener('loadedmetadata', () => {
     video.play()
   })
   let video_text = document.createElement("span")
-  video_text.textContent = document.querySelector("#user_name").value;
+  video_text.textContent = (document.querySelector("#user_name").value);
   let video_div = document.createElement("div");
   video_text.classList.add("name");
   video_div.appendChild(video_text)
   video_div.appendChild(video);
   video_div.style.position = "relative"
   video_div.classList.add("video");
+  if (isScreen) {
+    video_div.classList.add("screen");
+  }
   video_div.classList.add(stream.id);
+  if (isScreen) {
+    return videoGrid.prepend(video_div);
+  }
   videoGrid.append(video_div);
 }
 
 
+// document.querySelector(".fa-user-freinds").addEventListener 
 
 const muteUnmute = () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;

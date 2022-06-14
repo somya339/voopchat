@@ -61,7 +61,8 @@
     <!-- <link rel="stylesheet" href="./css/styles.css"> -->
 </head>
 
-<body>
+<body style="height: 100%; width: 100%;
+">
     <div class="request-freez hid">
         <div class="request-join">
             <div class="inner-box">
@@ -126,19 +127,28 @@
                 </div>
             </div>
         </div>
+        <!-- <div class="participant-corner">
+            <div class="participant-list">
+                <ul>
+                    <li>Somya</li>
+                    <li>Somya</li>
+                    <li>Somya</li>
+                </ul>
+            </div>
+        </div> -->
         <div class="main__right" id="chat_menu">
-            <div class="main__header">
-                <h6>Chat</h6>
+            <div class="main__header" style="margin: 10px;">
+                <h6 style="font-size: 30px;">Voop Chat... </h6>
             </div>
             <div class="main__chat_window">
                 <ul class="messages">
 
                 </ul>
-
             </div>
             <div class="main__message_container">
                 <input id="chat_message" type="text" placeholder="Type message here...">
-                <input type="hidden" name="user" value=<%=user %> id ="user_name"/>
+                <i src="./images/next.svg" alt="Send">
+                    <input type="hidden" name="user" value=<%=user %> id ="user_name"/>
             </div>
         </div>
     </div>

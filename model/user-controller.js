@@ -15,9 +15,6 @@ class User{
             console.log(err);
         });
     }
-    // static delete(socketId , StreamId){
-        
-    // }
 }
 
 module.exports = User;

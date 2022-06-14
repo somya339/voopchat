@@ -33,12 +33,10 @@ exports.postCheck = (req, res) => {
 
 exports.postSignup = (req, res) => {
     signup.fetch(req.body.email, req.body.username, (result) => {
-        // console.log(result);
         if (result == "1") {
             req.flash("User_Name_Exist", "The Username is already taken.");
             res.redirect("/signup");
         } else if (result == null) {
-            // console.log(process.env.EMAIL , req.body.email);
             otp = Math.floor(Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + Math.random() * 2000 + 4).toString();
             if (otp.length < 4) {
                 otp = "0" + otp;
@@ -66,14 +64,11 @@ exports.postSignup = (req, res) => {
             }, 200000);
             transporter.sendMail(mailoptions, (err, data) => {
                 if (err) {
-                    // console.log(data);
-                    // console.log(err);
                 } else {
                     console.log("MAIL sent!");
                 }
             });
             bcrypt.hash(req.body.password, 12, (err, result) => {
-                // res.locals.session_code = result;
                 const model = new signup(req.body.username, req.body.email, result, otp);
                 model.save();
             })
@@ -112,7 +107,6 @@ exports.getlogin = (req, res) => {
     });
 }
 exports.postLogin = (req, res) => {
-    // console.log(req.body.username);
     let password = req.body.password
     signup.check_cred(req.body.username, (result) => {
         if (result) {

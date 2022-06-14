@@ -39,9 +39,17 @@ io.on("connection", async socket => {
     let sockets = Object.values(clients);
     let users = sockets.map(s => s.id);
     ids = users
-    socket.on('join-room-success', (roomid, peerid, socketId, username) => {
+    // socket.set("nickname", username)
+    socket.on('join-room-success', (roomid, peerid, socketId, username, isScreen) => {
+        // io.sockets.sockets[socketId].get("nickname", (err, nickname) => {
+        //     console.log(nickname);
+        // })
         socket.join(roomid);
-        socket.to(roomid).emit("user-connected", peerid, socketId);
+        socket.to(roomid).emit("user-connected", peerid, socketId, username, isScreen);
+        // if (isScreen == false) {
+        // } else {
+        //     socket.to(roomid).emit("Screen-connected", peerid, socketId , username);
+        // }
         socket.on("store-user", (streamId) => {
             console.log("store called");
             db.collection("session-id").insertOne({
@@ -99,7 +107,8 @@ io.on("connection", async socket => {
     //     socket.to(ids[(ids.length - 1)]).emit("now-connect-to-room", peerid, socketId);
 
     socket.on("screen-disconnect", (socketId, streamId, roomid) => {
-        console.log(streamId + "here");
+        socket.to(roomid).emit('close-screen');
+        console.log(streamId, "   ", roomid);
         // RemoveScreen(screensoc, socketId, streamId, roomid);
         db.collection("session-id").findOne({
             streamId: streamId
@@ -107,7 +116,7 @@ io.on("connection", async socket => {
             ids = result;
             if (result) {
                 console.log(result.socketId);
-                socket.to(roomid).emit("user-disconnect", result.socketId, result.streamId);
+                socket.to(roomid).emit('user-disconnect', socketId, streamId);
                 db.collection("session-id").deleteOne({
                     socketId: result.socketId
                 }).then((result) => {
@@ -126,8 +135,6 @@ io.on("connection", async socket => {
 router.get("/", (req, res) => {
     res.redirect(`/signup`)
 });
-
-
 app.use("/", router);
 mongo.connect(() => {
     server.listen(process.env.PORT || 3400, () => {
