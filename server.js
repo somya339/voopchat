@@ -1,29 +1,31 @@
-const express = require('express');
-const app = require('express')();
-const env = require('dotenv');
+const express = require("express");
+const app = require("express")();
+const env = require("dotenv");
 env.config();
-const server = require('http').Server(app);
-const path = require('path');
-const mongo = require('./utils/database');
-const router = require('./router/router');
-const body = require('body-parser');
-const flash = require('express-flash');
-const session = require('express-session');
-const io = require('socket.io')(server);
-const {
-    ExpressPeerServer
-} = require('peer');
+const server = require("http").Server(app);
+const path = require("path");
+const mongo = require("./utils/database");
+const router = require("./router/router");
+const body = require("body-parser");
+const flash = require("express-flash");
+const session = require("express-session");
+const io = require("socket.io")(server);
+const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
     debug: true,
-})
-app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
-app.use(body.urlencoded({
-    extended: false
-}))
+});
+app.use(
+    session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+app.use(
+    body.urlencoded({
+        extended: false,
+    })
+);
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", "views");
 app.set("view engine", "ejs");
@@ -31,7 +33,7 @@ app.use(flash());
 app.use("/peerjs", peerServer);
 let room;
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
     var db = mongo.getdb();
     console.log(socket);
     // The code to get socket ids
@@ -48,50 +50,64 @@ io.on("connection", socket => {
         });
         socket.on("store-user", (streamId) => {
             console.log("store called");
-            db.collection("session-id").insertOne({
-                socketId: socketId,
-                streamId: streamId
-            }).then((result) => {
-                console.log("user Inserted")
-            }).catch((err) => {
-                console.log(err);
-            });
-        })
+            db.collection("session-id")
+                .insertOne({
+                    socketId: socketId,
+                    streamId: streamId,
+                })
+                .then((result) => {
+                    console.log("user Inserted");
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        });
         socket.on("screen-disconnect", (socketId, streamId, roomid) => {
             console.log("disconnect-detected");
             socket.to(roomid).emit("remove-screen", streamId);
-        })
+        });
         socket.on("disconnect", () => {
             console.log(socket.id);
             // var ids;
             // RemoveStream(socket, roomid);
-            db.collection("session-id").findOne({
-                socketId: socket.id
-            }).then((result) => {
-                // ids = result;
-                if (result) {
-                    console.log(result.streamId);
-                    socket.to(roomid).emit("user-disconnect", result.socketId, result.streamId);
-                    db.collection("session-id").deleteOne({
-                        streamId: result.streamId
-                    }).then((result) => {
-                        console.log("record removed");
-                    }).catch((err) => {
-                        console.log(err);
-                    });
-                } else {
-                    console.log("no such record");
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
-        })
-    })
-})
-router.get("/", (req, res) => {
-    res.redirect(`/signup`)
+            db.collection("session-id")
+                .findOne({
+                    socketId: socket.id,
+                })
+                .then((result) => {
+                    // ids = result;
+                    if (result) {
+                        console.log(result.streamId);
+                        socket
+                            .to(roomid)
+                            .emit(
+                                "user-disconnect",
+                                result.socketId,
+                                result.streamId
+                            );
+                        db.collection("session-id")
+                            .deleteOne({
+                                streamId: result.streamId,
+                            })
+                            .then((result) => {
+                                console.log("record removed");
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else {
+                        console.log("no such record");
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        });
+    });
 });
-
+router.get("/", (req, res) => {
+    res.redirect(`/signup`);
+});
 
 app.use("/", router);
 mongo.connect(() => {
